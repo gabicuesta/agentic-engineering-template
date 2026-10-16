@@ -64,6 +64,10 @@ class JobRequest:
             raise DomainError("Quote amount must be positive.")
         self.quotes.append(quote)
 
+    def quotes_by_price(self, *, descending: bool = False) -> list[Quote]:
+        """The job's quotes ordered by amount, cheapest first unless `descending`. Does not mutate the job."""
+        return sorted(self.quotes, key=lambda q: q.amount_eur, reverse=descending)
+
     def accept_quote(self, quote_id: UUID) -> Quote:
         if self.status is not JobStatus.OPEN:
             raise DomainError(f"Job is {self.status.value}; a quote can't be accepted.")

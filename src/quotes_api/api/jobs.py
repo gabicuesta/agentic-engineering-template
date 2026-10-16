@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from ..domain.models import DomainError, JobRequest, JobStatus, Quote
 from ..storage.repository import JobRepository
 from .deps import get_repository
-from .schemas import JobCreate, JobOut, QuoteCreate, QuoteOut
+from .schemas import JobCreate, JobOut, QuoteCreate, QuoteOut, SortOrder
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 Repo = Annotated[JobRepository, Depends(get_repository)]
@@ -50,6 +50,12 @@ def add_quote(job_id: UUID, body: QuoteCreate, repo: Repo) -> Quote:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
     repo.save(job)
     return quote
+
+
+@router.get("/{job_id}/quotes", response_model=list[QuoteOut])
+def list_quotes(job_id: UUID, repo: Repo, order: SortOrder = SortOrder.ASC) -> list[Quote]:
+    job = _get_or_404(repo, job_id)
+    return job.quotes_by_price(descending=order is SortOrder.DESC)
 
 
 @router.post("/{job_id}/quotes/{quote_id}/accept", response_model=JobOut)

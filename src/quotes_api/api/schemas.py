@@ -4,11 +4,17 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+from enum import StrEnum
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from ..domain.models import JobStatus, QuoteStatus
+
+
+class SortOrder(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
 
 
 class JobCreate(BaseModel):
