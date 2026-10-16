@@ -1,0 +1,19 @@
+# Monthly snapshot of how the team works with agents (see scripts/agent_metrics.py).
+name: Agent metrics
+
+on:
+  schedule:
+    - cron: "0 7 1 * *"
+  workflow_dispatch:
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python scripts/agent_metrics.py --since "90 days ago" --markdown >> "$GITHUB_STEP_SUMMARY"

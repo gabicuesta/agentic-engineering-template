@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "spain-open-data": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/gabicuesta/spain-open-data-mcp", "spain-open-data-mcp"]
+    }
+  }
+}
