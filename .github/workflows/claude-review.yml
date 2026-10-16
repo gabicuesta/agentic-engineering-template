@@ -1,5 +1,6 @@
 # Automatic AI review on every PR. It complements human review; it never replaces it:
 # branch protection still requires an approving review from a person (see docs/playbook.md).
+# Skipped for Dependabot: its runs don't receive repository secrets, and dependency bumps are covered by CI.
 name: AI code review
 
 on:
@@ -8,7 +9,7 @@ on:
 
 jobs:
   review:
-    if: github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -17,7 +18,7 @@ jobs:
       issues: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
       - uses: anthropics/claude-code-action@v1
