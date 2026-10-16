@@ -103,6 +103,15 @@ The full records are in [`docs/adr`](docs/adr).
 - [llm-gateway](https://github.com/gabicuesta/llm-gateway): budgets, fallback and PII redaction for teams
   using LLMs.
 
+## See it in action
+
+A real task, done end to end with this setup:
+
+1. **Issue [#4](https://github.com/gabicuesta/agentic-engineering-template/issues/4)**: specified with the *Agent-ready task* template (goal, context, acceptance criteria, out of scope).
+2. **`@claude` comment** → Claude Code ran in GitHub Actions, following `AGENTS.md`, the hooks and the `/new-endpoint` skill, and pushed a branch.
+3. **PR [#5](https://github.com/gabicuesta/agentic-engineering-template/pull/5)**: CI green on three Python versions, plus a first-pass AI review.
+4. **A human reviewed, approved and merged it.** The PR declares the AI assistance; the merge stays with a person.
+
 ## License
 
 MIT.
