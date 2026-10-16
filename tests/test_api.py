@@ -31,3 +31,42 @@ def test_filters(client, job):
     client.post("/jobs", json={"title": "Pintar", "description": "Piso de 80 m2", "province": "Valencia"})
     assert len(client.get("/jobs", params={"province": "madrid"}).json()) == 1
     assert len(client.get("/jobs", params={"status": "open"}).json()) == 2
+
+
+def _add_three_quotes(client, job) -> None:
+    for name, amount in [("Medio", "2400"), ("Barato", "900.50"), ("Caro", "10000")]:
+        client.post(f"/jobs/{job['id']}/quotes", json={"professional": name, "amount_eur": amount})
+
+
+def test_listing_quotes_sorts_by_price_ascending_by_default(client, job):
+    _add_three_quotes(client, job)
+
+    r = client.get(f"/jobs/{job['id']}/quotes")
+
+    assert r.status_code == 200
+    assert [q["professional"] for q in r.json()] == ["Barato", "Medio", "Caro"]
+    assert set(r.json()[0]) == {"id", "professional", "amount_eur", "message", "status", "created_at"}
+
+
+def test_listing_quotes_with_order_desc_sorts_most_expensive_first(client, job):
+    _add_three_quotes(client, job)
+
+    r = client.get(f"/jobs/{job['id']}/quotes", params={"order": "desc"})
+
+    assert r.status_code == 200
+    assert [q["professional"] for q in r.json()] == ["Caro", "Medio", "Barato"]
+
+
+def test_listing_quotes_with_an_invalid_order_is_422(client, job):
+    assert client.get(f"/jobs/{job['id']}/quotes", params={"order": "price"}).status_code == 422
+
+
+def test_listing_quotes_of_an_unknown_job_is_404(client):
+    assert client.get("/jobs/00000000-0000-0000-0000-000000000000/quotes").status_code == 404
+
+
+def test_listing_quotes_of_a_job_without_quotes_is_an_empty_list(client, job):
+    r = client.get(f"/jobs/{job['id']}/quotes")
+
+    assert r.status_code == 200
+    assert r.json() == []

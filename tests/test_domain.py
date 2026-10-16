@@ -50,3 +50,26 @@ def test_accepted_job_cannot_be_cancelled():
     job.accept_quote(q.id)
     with pytest.raises(DomainError):
         job.cancel()
+
+
+def make_job_with_three_quotes() -> JobRequest:
+    job = make_job()
+    for name, amount in [("Medio", "2400"), ("Barato", "900.50"), ("Caro", "10000")]:
+        job.add_quote(Quote(name, Decimal(amount)))
+    return job
+
+
+def test_quotes_by_price_sorts_cheapest_first():
+    job = make_job_with_three_quotes()
+    assert [q.professional for q in job.quotes_by_price()] == ["Barato", "Medio", "Caro"]
+
+
+def test_quotes_by_price_can_sort_most_expensive_first():
+    job = make_job_with_three_quotes()
+    assert [q.professional for q in job.quotes_by_price(descending=True)] == ["Caro", "Medio", "Barato"]
+
+
+def test_quotes_by_price_does_not_reorder_the_job_quotes():
+    job = make_job_with_three_quotes()
+    job.quotes_by_price()
+    assert [q.professional for q in job.quotes] == ["Medio", "Barato", "Caro"]
